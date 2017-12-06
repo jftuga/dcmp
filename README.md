@@ -1,27 +1,27 @@
 # dcmp
-Compare files within two directory trees for equivalency
+Compare files within two directory trees for equivalency.
 
-The purpose of this program is to recursivly examine two directories to find all files that are either the 
+The purpose of this program is to recursively examine two directories to find all files that are either the 
 same, different, or mutually exclusive.  
 
-Two files are considered to be the same if they have the same:
+Two files are considered to be the equivalent if they have the same:
 
 * Name
 * Size
 * Modification Time (this check can be excluded with **--ignoredate**)
 
-File contents are not compared unless **--exact** is invoked.  When this option is used, you may
-want to also invoke the **--threads** option to speed up processing.
+Only metadata is compared.  File contents are not compared unless **--exact** is invoked.
+When this option is used, you may want to also invoke the **--threads** option to speed up processing.
 
-Groups of files and directories can be excluded via the **--exfile** and **--exdir** options.
+Groups of files and directories can be excluded with regular expressions via the **--exfile** and **--exdir** options.
 
-A Windows executable can be created with (PyInstaller 3.3)[http://www.pyinstaller.org/]
+A Windows executable can be created with [PyInstaller 3.3](http://www.pyinstaller.org/):
 ```
     : ensure both dcmp.py and veryprettytablepatched.py are in the current directory
     pyinstaller -F --noupx dcmp.py
 ```
 
-All command line options can be reviewed by invoking **-h**.
+All command line options can be reviewed by invoking **-h**:
 
 ```
     usage: dcmp.py [-h] [--recurse] [--threads THREADS] [--exact] [--ignoredate]
