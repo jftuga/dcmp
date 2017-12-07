@@ -39,7 +39,7 @@ class dir_compare():
 	"""Compare files within two directory trees for equivalency
 	"""
 
-	class_version = "1.00"
+	class_version = "1.01"
 
 	# output date format
 	date_time_fmt = "%m/%d/%y %H:%M:%S"
@@ -102,6 +102,9 @@ class dir_compare():
 
 		if self.args.threads:
 			self.max_workers = int(self.args.threads)
+			if self.max_workers <= 0:
+				print("\nError: threads must be greater than zero\n");
+				sys.exit(1)
 			self.mgr.start()
 			self.file_stats = self.mgr.defaultdict(int)
 		else:
@@ -259,20 +262,9 @@ class dir_compare():
 				Nothing, as self.all_twins is a class variable
 		"""
 
-		d1 = {}
-		d2 = {}
-
-		for f in os.scandir(dname1):
-			if f.is_dir():
-				d1[f.name] = f.name	
-
-		for f in os.scandir(dname2):
-			if f.is_dir():
-				d2[f.name] = f.name	
-
-		s1 = set(d1)
-		s2 = set(d2)
-		same_dnames = s1.intersection(s2)
+		gen_folder = lambda dname : set(f.name for f in os.scandir(dname) if f.is_dir() )
+		same_dnames  = gen_folder(dname1) | gen_folder(dname2)
+		same_dnames = sorted(same_dnames)
 
 		for d in same_dnames:
 			a = os.path.join(dname1,d)
@@ -367,28 +359,14 @@ class dir_compare():
 			   This adds a row to the VeryPrettyTablePatched object and populates
 			   the results for dates and file sizes
 			"""
+
+			display_time = lambda s: (s,'') if meta_val == 1 else ('',s)
+			same_meta = "Only in %s" % (meta_val)
 			for fname in exclusive:
-					fname_time = time.localtime(d[fname][5])
-					if 1 == meta_val:
-						fname_fulldate_1 = time.strftime(self.date_time_fmt,fname_time)
-						fname_fulldate_2 = ""
-					else:
-						fname_fulldate_1 = ""
-						fname_fulldate_2 = time.strftime(self.date_time_fmt,fname_time)
-
-					if 1 == meta_val:
-						f1_sz = "{:,}".format(d[fname][4])
-						f2_sz = ""
-						if d[fname][0]:
-							f1_sz = "<DIR>"
-					else:
-						f1_sz = ""
-						f2_sz = "{:,}".format(d[fname][4])
-						if d[fname][0]:
-							f2_sz = "<DIR>"
-
-					same_meta = "Only in %s" % (meta_val)
-					x.add_row((fname, same_meta, f1_sz, f2_sz, fname_fulldate_1, fname_fulldate_2, ""))
+				fname_time = time.localtime(d[fname][5])
+				fname_fulldate =  time.strftime(self.date_time_fmt,fname_time)
+				file_sz = "{:,}".format(d[fname][4]) if not d[fname][0] else "<DIR>"
+				x.add_row( (fname, same_meta) + display_time(file_sz) + display_time(fname_fulldate) + ('',) )
 		#
 		### end of nested function
 
