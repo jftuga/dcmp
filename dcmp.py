@@ -39,7 +39,7 @@ class dir_compare():
 	"""Compare files within two directory trees for equivalency
 	"""
 
-	class_version = "1.01"
+	class_version = "1.02"
 
 	# output date format
 	date_time_fmt = "%m/%d/%y %H:%M:%S"
@@ -263,7 +263,7 @@ class dir_compare():
 		"""
 
 		gen_folder = lambda dname : set(f.name for f in os.scandir(dname) if f.is_dir() )
-		same_dnames  = gen_folder(dname1) | gen_folder(dname2)
+		same_dnames  = gen_folder(dname1) & gen_folder(dname2)
 		same_dnames = sorted(same_dnames)
 
 		for d in same_dnames:
