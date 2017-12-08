@@ -6,11 +6,6 @@
 
 # Compare files within two directory trees for equivalency
 
-# TODO:
-#	code reduction: just use executer and don't split between orig dir & sub dirs
-#	make HTML version of output_stats()
-
-
 import argparse
 import io
 import multiprocessing
@@ -39,7 +34,7 @@ class dir_compare():
 	"""Compare files within two directory trees for equivalency
 	"""
 
-	class_version = "1.02"
+	class_version = "1.03"
 
 	# output date format
 	date_time_fmt = "%m/%d/%y %H:%M:%S"
@@ -145,11 +140,13 @@ class dir_compare():
 		if self.args.stats:
 			self.time_end = time.time()
 			x = VeryPrettyTablePatched()
-			# 'same_meta': 36822, 'exact_data': 36814, 'not_same_meta': 1, 'not_exact_data': 2, 'same_meta_but_not_exact_data': 1
 			x.field_names = ( "same_meta", "not_same_meta", "exact_data", "not_exact_data", "same_meta_different_data" )
 			x.align = "l"
 			x.add_row((self.file_stats["same_meta"], self.file_stats["not_same_meta"], self.file_stats["exact_data"], self.file_stats["not_exact_data"], self.file_stats["same_meta_different_data"]))
-			self.output_stats(x)
+			if not self.args.html:
+				self.output_stats(x)
+			else:
+				self.output_stats_to_html(x)
 
 	#############################################################################
 
@@ -463,7 +460,7 @@ class dir_compare():
 
 			dname2: the second directory, used in the table's title
 		"""
-		a = x.get_string(sortby="fname")
+		tbl = x.get_string(sortby="fname")
 		if not len(x._rows):
 			return # do not output when there are no rows
 		width = 3*len(x._widths) + sum(x._widths) + 1
@@ -471,7 +468,7 @@ class dir_compare():
 		print("-"* width)
 		print("| 1) %s %s |" % (dname1," " * (width - len(dname1)-8)))
 		print("| 2) %s %s |" % (dname2," " * (width - len(dname2)-8)))
-		print(a)
+		print(tbl)
 		print()
 
 		if self.args.diff and self.args.pgm and len(self.output_files):
@@ -492,8 +489,8 @@ class dir_compare():
 				cmd = "%s%s%s %s%s%s %s%s%s" % (q1,self.args.pgm,q1, q2,twins[0],q2, q3,twins[1],q3)
 				d.add_row( (cmd, ))
 
-			a = d.get_string(sortby="diff")
-			print(a)
+			tbl = d.get_string(sortby="diff")
+			print(tbl)
 			print()
 			# remove all entries so that the next folder starts fresh
 			self.output_files = []
@@ -512,31 +509,67 @@ class dir_compare():
 
 			dname2: the second directory, used in the table's title
 		"""
-		a = x.get_html_string(sortby="fname")
+		tbl = x.get_html_string(sortby="fname")
 		if not len(x._rows):
 			return # do not output when there are no rows
-		a = a.replace("<table>","<table>\n    <tr><td colspan=7>1) %s</td></tr>\n    <tr><td colspan=7>2) %s</td></tr>\n" % (dname1,dname2))
-		a = a.replace("<table>", "<table border='1' cellspacing='3' cellpadding='3'>")
-		print(a)
+		tbl = tbl.replace("<table>","<table>\n    <tr><td colspan='7'>1) %s</td></tr>\n    <tr><td colspan='7'>2) %s</td></tr>\n" % (dname1,dname2))
+		tbl = tbl.replace("<table>", "<table border='1' cellspacing='3' cellpadding='3'>")
+		print(tbl)
 		print("<br /><hr noshade><br />")
 
 #############################################################################
 
 	def output_stats(self, x:VeryPrettyTablePatched):
-		if self.args.html:
-			return
+		"""Display the following information:
+			same_meta, not_same_meta, exact_data, not_exact_data, same_meta_different_data
+			program's runtime
 
-		
-		print("",file=sys.stderr)
-		a = x.get_string()
-		print(a, file=sys.stderr)
-		print("",file=sys.stderr)
+		Args:
+			x: a one row VeryPrettyTablePatched table containing this information
+		"""
+
+		tbl = x.get_string()
 
 		runtime = self.time_end - self.time_start
 		m, s = divmod(runtime, 60)
 		h, m = divmod(m, 60)
-		print("runtime (h:m:s) %02d:%02d:%02d" % (h, m, s),file=sys.stderr)
-		print("runtime     (s) %0.2f" % (runtime),file=sys.stderr)
+
+		width = 3*len(x._widths) + sum(x._widths) + 1
+
+		print("-" * width,file=sys.stderr)
+		cmd = " ".join(sys.argv)
+		rt = "runtime (h:m:s) %02d:%02d:%02.2f" % (h,m,runtime)
+		print("| %s %s |" % (cmd," " * (width - len(cmd)-5)),file=sys.stderr)
+		print("| %s %s |" % (rt," " * (width - len(rt)-5)),file=sys.stderr)
+		print(tbl, file=sys.stderr)
+		print("",file=sys.stderr)
+
+#############################################################################
+
+	def output_stats_to_html(self, x:VeryPrettyTablePatched):
+		"""Display the following information:
+			same_meta, not_same_meta, exact_data, not_exact_data, same_meta_different_data
+			program's runtime
+
+		Args:
+			x: a one row VeryPrettyTablePatched table containing this information
+		"""
+
+		tbl = x.get_html_string()
+		if not len(x._rows):
+			return # do not output when there are no rows
+		
+		cmd = " ".join(sys.argv)
+		runtime = self.time_end - self.time_start
+		m, s = divmod(runtime, 60)
+		h, m = divmod(m, 60)
+		
+		tbl = tbl.replace("<table>","<table>\n    <tr><td colspan='5'>%s</td></tr>\n    <tr><td colspan='5'>runtime (h:m:s) %02d:%02d:%02.2f</td></tr>\n" % (cmd,h,m,runtime))
+		tbl = tbl.replace("<table>", "<table border='1' cellspacing='3' cellpadding='3'>")
+		print("")
+		print(tbl)
+		print("<br /><hr noshade><br />")
+		print()
 
 	# end of class: dir_compare
 	###########################
