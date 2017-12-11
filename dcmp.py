@@ -35,18 +35,18 @@ class MyManager(BaseManager):
 
 #############################################################################
 
-class dir_compare():
+class Dir_Compare():
 	"""Compare files within two directory trees for equivalency
 	"""
 
-	class_version = "1.04"
+	class_version = "1.05"
 
 	# output date format
 	date_time_fmt = "%m/%d/%y %H:%M:%S"
 	# buffer size used to compare, when --exact is used
 	file_cmp_bufsize = io.DEFAULT_BUFFER_SIZE
 	# when processing the current directory, maintain a queue of subdirectories to be processed
-	dir_queue = queue.Queue()
+	dir_queue = None
 	# a list of directories to be skipped via the --exdir option
 	skip_directories = []
 	# a list of files to be skipped via the --exfile option
@@ -73,6 +73,7 @@ class dir_compare():
 		""" No argurments need to be passed in.
 		    Process cmd line arguments and start comparing directories
 		"""
+		self.dir_queue = queue.Queue()
 		self.process_cmd_line_args()
 
 		if self.args.stats:
@@ -575,7 +576,7 @@ class dir_compare():
 		print("<br /><hr noshade><br />")
 		print()
 
-	# end of class: dir_compare
+	# end of class: Dir_Compare
 	###########################
 
 #############################################################################
@@ -583,4 +584,4 @@ class dir_compare():
 if "__main__" == __name__:
 	multiprocessing.freeze_support()
 	MyManager.register('defaultdict', defaultdict, DictProxy)
-	dir_compare()
+	Dir_Compare()
