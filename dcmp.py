@@ -39,7 +39,7 @@ class Dir_Compare():
 	"""Compare files within two directory trees for equivalency
 	"""
 
-	class_version = "1.05"
+	class_version = "1.07"
 
 	# output date format
 	date_time_fmt = "%m/%d/%y %H:%M:%S"
