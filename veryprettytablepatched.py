@@ -1487,7 +1487,7 @@ class VeryPrettyTablePatched(object):
         rows = self._get_rows(options)
         formatted_rows = self._format_rows(rows, options)
         for row in formatted_rows:
-            lines.append("    <tr>")
+            lines.append("    <tr onmouseover=\"this.style.background='#0FF'\" onmouseout=\"this.style.background='#FFF'\">")
             for field, datum in zip(self._field_names, row):
                 if options["fields"] and field not in options["fields"]:
                     continue
