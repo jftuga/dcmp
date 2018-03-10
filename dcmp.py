@@ -39,7 +39,7 @@ class Dir_Compare():
 	"""Compare files within two directory trees for equivalency
 	"""
 
-	class_version = "1.07"
+	class_version = "1.08"
 
 	# output date format
 	date_time_fmt = "%m/%d/%y %H:%M:%S"
@@ -184,7 +184,7 @@ class Dir_Compare():
 
 		output_opts = parser.add_argument_group(title="Output Arguments",description=None)
 		output_opts.add_argument("--pgm", action=None, help="output diff commands, by using PGM as your comparision program")
-		output_opts.add_argument("--html", action="store_true", help="create HTML output")
+		output_opts.add_argument("--html", action="store_true", help="create HTML output which should then be redirected to a file")
 		output_opts.add_argument("--stats", "-S", action="store_true", help="print run time & statistical totals to STDERR")
 		output_opts.add_argument("--verbose", "-v", action="store_true", help="output exclusions to STDERR")
 

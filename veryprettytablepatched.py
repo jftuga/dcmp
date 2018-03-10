@@ -1486,8 +1486,11 @@ class VeryPrettyTablePatched(object):
         # Data
         rows = self._get_rows(options)
         formatted_rows = self._format_rows(rows, options)
+        bgcolor = "#FFF"
         for row in formatted_rows:
-            lines.append("    <tr onmouseover=\"this.style.background='#0FF'\" onmouseout=\"this.style.background='#FFF'\">")
+            # a few color choices: DEDEDE D6D6D6 D8DFFA
+            bgcolor = "#D6D6D6" if bgcolor == "#FFF" else "#FFF"
+            lines.append("    <tr bgcolor=\"%s\" onmouseover=\"this.style.background='#0FF'\" onmouseout=\"this.style.background='%s'\">" % (bgcolor,bgcolor))
             for field, datum in zip(self._field_names, row):
                 if options["fields"] and field not in options["fields"]:
                     continue
