@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# VeryPrettyTable copyright:
+# VeryPrettyTablePatched copyright:
 #
 # Copyright (c) 2014, Scott Blevins <sblevins@gmail.com>
 #
@@ -91,7 +91,7 @@ class VeryPrettyTablePatched(object):
 
     def __init__(self, field_names=None, **kwargs):
 
-        """Return a new VeryPrettyTable instance
+        """Return a new VeryPrettyTablePatched instance
 
         Arguments:
 
@@ -246,7 +246,7 @@ class VeryPrettyTablePatched(object):
 
     def __getitem__(self, index):
 
-        new = VeryPrettyTable()
+        new = VeryPrettyTablePatched()
         new.field_names = self.field_names
         for attr in self._options:
             setattr(new, "_"+attr, getattr(self, "_"+attr))
@@ -1628,7 +1628,7 @@ def from_csv(fp, field_names = None, **kwargs):
         fp.seek(0)
         reader = csv.reader(fp, dialect)
 
-    table = VeryPrettyTable(**kwargs)
+    table = VeryPrettyTablePatched(**kwargs)
     if field_names:
         table.field_names = field_names
     else:
@@ -1645,7 +1645,7 @@ def from_csv(fp, field_names = None, **kwargs):
 def from_db_cursor(cursor, **kwargs):
 
     if cursor.description:
-        table = VeryPrettyTable(**kwargs)
+        table = VeryPrettyTablePatched(**kwargs)
         table.field_names = [col[0] for col in cursor.description]
         for row in cursor.fetchall():
             table.add_row(row)
@@ -1702,9 +1702,9 @@ class TableHandler(HTMLParser):
 
     def generate_table(self, rows):
         """
-        Generates from a list of rows a VeryPrettyTable object.
+        Generates from a list of rows a VeryPrettyTablePatched object.
         """
-        table = VeryPrettyTable(**self.kwargs)
+        table = VeryPrettyTablePatched(**self.kwargs)
         for row in self.rows:
             if len(row[0]) < self.max_row_width:
                 appends = self.max_row_width - len(row[0])
@@ -1729,8 +1729,8 @@ class TableHandler(HTMLParser):
 
 def from_html(html_code, **kwargs):
     """
-    Generates a list of VeryPrettyTables from a string of HTML code. Each <table> in
-    the HTML becomes one VeryPrettyTable object.
+    Generates a list of VeryPrettyTablePatcheds from a string of HTML code. Each <table> in
+    the HTML becomes one VeryPrettyTablePatched object.
     """
 
     parser = TableHandler(**kwargs)
@@ -1739,7 +1739,7 @@ def from_html(html_code, **kwargs):
 
 def from_html_one(html_code, **kwargs):
     """
-    Generates a VeryPrettyTables from a string of HTML code which contains only a
+    Generates a VeryPrettyTablePatcheds from a string of HTML code which contains only a
     single <table>
     """
 
@@ -1760,7 +1760,7 @@ def from_django_query(query_set, **kwargs):
     else:
         raise ValueError("Type %s is unknown to this function" % (str(type(query_set).__name__)))
 
-    table = VeryPrettyTable(**kwargs)
+    table = VeryPrettyTablePatched(**kwargs)
     table.field_names = itr.field_names
     for row in itr:
         table.add_row(row)
@@ -1772,7 +1772,7 @@ def from_django_query(query_set, **kwargs):
 
 def main():
 
-    x = VeryPrettyTable(["City name", "Area", "Population", "Annual Rainfall"])
+    x = VeryPrettyTablePatched(["City name", "Area", "Population", "Annual Rainfall"])
     x.title = "Australian capital cities"
     x.sortby = "Population"
     x.reversesort = True
