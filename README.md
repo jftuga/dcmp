@@ -26,11 +26,11 @@ A Windows executable can be created with [PyInstaller 3.3](http://www.pyinstalle
 **Usage**
 
 ```
-    usage: dcmp.exe [-h] [--recurse] [--threads THREADS] [--exact] [--ignoredate]
-                    [--exdir EXDIR] [--exfile EXFILE]
-                    [--diff | --same | --xor | --one | --two | --version]
-                    [--pgm PGM] [--html] [--stats] [--verbose]
-                    dname1 dname2
+    usage: dcmp [-h] [--recurse] [--threads THREADS] [--exact] [--ignoredate]
+                [--exdir EXDIR] [--exfile EXFILE]
+                [--diff | --same | --xor | --one | --two | --version] [--pgm PGM]
+                [--html] [--stats] [--verbose]
+                dname1 dname2
     
     Directory Compare: compare files within two directory trees for equivalency
     
@@ -64,8 +64,9 @@ A Windows executable can be created with [PyInstaller 3.3](http://www.pyinstalle
     
     Output Arguments:
       --pgm PGM             output diff commands, by using PGM as your comparision
-                            program
-      --html                create HTML output
+                            program, must be used with -e
+      --html                create HTML output which should then be redirected to
+                            a file
       --stats, -S           print run time & statistical totals to STDERR
       --verbose, -v         output exclusions to STDERR
 
