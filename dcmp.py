@@ -39,7 +39,7 @@ class Dir_Compare():
     """Compare files within two directory trees for equivalency
     """
 
-    class_version = "1.10"
+    class_version = "1.11"
 
     # output date format
     date_time_fmt = "%m/%d/%y %H:%M:%S"
@@ -183,7 +183,7 @@ class Dir_Compare():
         mutuallyexclusive_opts.add_argument('--version', action='version', version='version %s' % (self.class_version))
 
         output_opts = parser.add_argument_group(title="Output Arguments",description=None)
-        output_opts.add_argument("--pgm", action=None, help="output diff commands, by using PGM as your comparision program, must be used with -d")
+        output_opts.add_argument("--pgm", action=None, help="output diff commands, by using PGM as your comparision program, must be used with -e")
         output_opts.add_argument("--html", action="store_true", help="create HTML output which should then be redirected to a file")
         output_opts.add_argument("--stats", "-S", action="store_true", help="print run time & statistical totals to STDERR")
         output_opts.add_argument("--verbose", "-v", action="store_true", help="output exclusions to STDERR")
@@ -476,29 +476,37 @@ class Dir_Compare():
         print(tbl)
         print()
 
-        if self.args.diff and self.args.pgm and len(self.output_files):
+        if self.args.pgm and self.args.exact:
+            diff_file_count = 0
             d = VeryPrettyTablePatched()
             d.field_names = ( "diff", )
             d.align = "l"
             d.vertical_char=" "
 
-            for twins in self.output_files:
-                q1=q2=q3=""
-                quote_val = '"'
-                if self.args.pgm.find(" ") > -1:
-                    q1=quote_val
-                if twins[0].find(" ") > -1:
-                    q2=quote_val
-                if twins[1].find(" ") > -1:
-                    q3=quote_val
-                cmd = "%s%s%s %s%s%s %s%s%s" % (q1,self.args.pgm,q1, q2,twins[0],q2, q3,twins[1],q3)
-                d.add_row( (cmd, ))
+            q1=q2=q3=""
+            quote_val = '"'
+            if self.args.pgm.find(" ") > -1:
+                q1=quote_val
 
-            tbl = d.get_string(sortby="diff")
-            print(tbl)
-            print()
-            # remove all entries so that the next folder starts fresh
-            self.output_files = []
+            for entry in x:
+                # file is in both directories
+                # exact = False
+                if not entry._rows[0][6] and not entry._rows[0][1]:
+                    q2=q3=""
+                    full_path1 = os.path.join(dname1,entry._rows[0][0])
+                    if full_path1.find(" ") > -1:
+                        q2 = quote_val
+                    full_path2 = os.path.join(dname2,entry._rows[0][0])
+                    if full_path2.find(" ") > -1:
+                        q3 = quote_val
+                    cmd = "%s%s%s %s%s%s %s%s%s" % (q1,self.args.pgm,q1, q2,full_path1,q2, q3,full_path2,q3)
+                    d.add_row( (cmd, ))
+                    diff_file_count += 1
+
+            if diff_file_count:
+                diffpgm_tbl = d.get_string(sortby="diff")
+                print(diffpgm_tbl)
+                print()
 
     #############################################################################
 
