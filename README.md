@@ -15,7 +15,7 @@ When this option is used, you may want to also invoke the **--threads** option t
 
 Groups of files and directories can be excluded with regular expressions via the **--exfile** and **--exdir** options.
 
-This was written in **Python 3.6** and has been tested on Windows 10 and MacOS Sierra.
+This was written in **Python 3.6** and has been tested on Windows 10, Linux and MacOS Sierra.
 
 A Windows executable can be created with [PyInstaller 3.3](http://www.pyinstaller.org/):
 ```
