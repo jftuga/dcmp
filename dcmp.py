@@ -39,7 +39,7 @@ class Dir_Compare():
     """Compare files within two directory trees for equivalency
     """
 
-    class_version = "1.11"
+    class_version = "1.12"
 
     # output date format
     date_time_fmt = "%m/%d/%y %H:%M:%S"
@@ -171,6 +171,7 @@ class Dir_Compare():
         operational_opts.add_argument("--threads", "-T", action=None, help="use this number of threads")
         operational_opts.add_argument("--exact", "-e", action="store_true", help="compare file contents as well as metadata")
         operational_opts.add_argument("--ignoredate", "-id", action="store_true", help="do not compare file time stamps, good to use with -e")
+        operational_opts.add_argument("--exdot", action="store_true", help="ignore both files and directories that begin with a dot")
         operational_opts.add_argument("--exdir", action=None, help="a ; delimited list of regular expressions to exclude, only applied to directory names")
         operational_opts.add_argument("--exfile", action=None, help="a ; delimited list of regular expressions to exclude, only applied to file names")
 
@@ -320,8 +321,10 @@ class Dir_Compare():
 
         def should_not_exclude(obj_name:str, is_file:bool, is_dir:bool):
             """Determine if a file or directory should be excluded via the 
-               --exdir and/or --exfile options
+               --exdot, --exdir and/or --exfile options
             """
+            if self.args.exdot and "." == obj_name[0]:
+                return False
             if is_file and self.args.exfile:
                 file_should_skip = _in_exclusion_list(obj_name,self.re_skip_files)
                 return not file_should_skip
@@ -335,15 +338,15 @@ class Dir_Compare():
         ### end of nested functions
 
         for f in os.scandir(dname1):
-            mtime = f.stat().st_mtime if not self.args.ignoredate else 0
             if should_not_exclude(f.name, f.is_file(), f.is_dir()):
+                mtime = f.stat().st_mtime if not self.args.ignoredate else 0
                 d1[f.name] = ( f.is_dir(), f.is_file(), f.is_symlink(), f.stat().st_mode, f.stat().st_size, mtime )
             elif self.args.verbose:
                 print("Excluded %s: %s" % ("file" if f.is_file() else "directory", os.path.join(dname1,f.name)), file=sys.stderr)
 
         for f in os.scandir(dname2):
-            mtime = f.stat().st_mtime if not self.args.ignoredate else 0
             if should_not_exclude(f.name, f.is_file(), f.is_dir()):
+                mtime = f.stat().st_mtime if not self.args.ignoredate else 0
                 d2[f.name] = ( f.is_dir(), f.is_file(), f.is_symlink(), f.stat().st_mode, f.stat().st_size, mtime )
             elif self.args.verbose:
                 print("Excluded %s: %s" % ("file" if f.is_file() else "directory", os.path.join(dname2,f.name)), file=sys.stderr)
