@@ -2,7 +2,7 @@
 Compare files within two directory trees for equivalency.
 
 The purpose of this program is to recursively examine two directories to find all files that are either the 
-same, different, or mutually exclusive (in one folder, but not the other.  
+same, different, or mutually exclusive (in one folder, but not the other).  
 
 Two files are considered to be the equivalent if they have the same:
 
