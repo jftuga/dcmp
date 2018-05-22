@@ -57,6 +57,7 @@ A Windows executable can be created with [PyInstaller 3.3](http://www.pyinstalle
                             use this number of threads
       --exact, -e           compare file contents as well as metadata
       --ignoredate, -id     do not compare file time stamps, good to use with -e
+      --exdot               ignore both files and directories that begin with a dot
       --exdir EXDIR         a ; delimited list of regular expressions to exclude,
                             only applied to directory names
       --exfile EXFILE       a ; delimited list of regular expressions to exclude,
