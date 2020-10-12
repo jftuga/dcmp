@@ -39,7 +39,7 @@ class Dir_Compare():
     """Compare files within two directory trees for equivalency
     """
 
-    class_version = "1.12"
+    class_version = "1.13"
 
     # output date format
     date_time_fmt = "%m/%d/%y %H:%M:%S"
@@ -458,6 +458,21 @@ class Dir_Compare():
 
     #############################################################################
 
+    def safe_print(self, data:str, isError=False):
+        """ safely output print statements to the screen without have to worry any about unicode exceptions
+
+            Args:
+                data: what to safely output
+
+                isError: when True, output to stderr; otherwise output to stdout
+        """
+        dest = sys.stdout if not isError else sys.stderr
+        # can also use 'replace' instead of 'ignore' for errors= parameter
+        print( str(data).encode(sys.stdout.encoding, errors='ignore').decode(sys.stdout.encoding), file=dest )
+
+    #############################################################################
+
+
     def output_to_screen(self, x:VeryPrettyTablePatched, dname1:str, dname2:str):
         """Display the VeryPrettyTablePatched table to the screen
 
@@ -476,7 +491,10 @@ class Dir_Compare():
         print("-"* width)
         print("| 1) %s %s |" % (dname1," " * (width - len(dname1)-8)))
         print("| 2) %s %s |" % (dname2," " * (width - len(dname2)-8)))
-        print(tbl)
+        try:
+            print(tbl)
+        except:
+            self.safe_print(tbl)
         print()
 
         if self.args.pgm and self.args.exact:
